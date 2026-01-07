@@ -1,12 +1,10 @@
 from datetime import datetime
-
 from django.db.models import F, Count
 from rest_framework import viewsets, mixins, status
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.permissions import IsAuthenticated, IsAdminUser
 from rest_framework.response import Response
-from rest_framework.viewsets import GenericViewSet
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 
@@ -31,7 +29,7 @@ from cinema.serializers import (
 class GenreViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet,
+    viewsets.GenericViewSet,
 ):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
@@ -41,7 +39,7 @@ class GenreViewSet(
 class ActorViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet,
+    viewsets.GenericViewSet,
 ):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
@@ -51,7 +49,7 @@ class ActorViewSet(
 class CinemaHallViewSet(
     mixins.CreateModelMixin,
     mixins.ListModelMixin,
-    GenericViewSet,
+    viewsets.GenericViewSet,
 ):
     queryset = CinemaHall.objects.all()
     serializer_class = CinemaHallSerializer
@@ -202,7 +200,7 @@ class OrderPagination(PageNumberPagination):
 class OrderViewSet(
     mixins.ListModelMixin,
     mixins.CreateModelMixin,
-    GenericViewSet,
+    viewsets.GenericViewSet,
 ):
     queryset = Order.objects.prefetch_related(
         "tickets__movie_session__movie", "tickets__movie_session__cinema_hall"
@@ -212,7 +210,7 @@ class OrderViewSet(
     permission_classes = (IsAuthenticated,)
 
     def get_queryset(self):
-        return Order.objects.filter(user=self.request.user)
+        return self.queryset.filter(user=self.request.user)
 
     def get_serializer_class(self):
         if self.action == "list":
